@@ -1,4 +1,4 @@
-import type { MetaFunction } from '@remix-run/node'
+import type { LoaderFunction, MetaFunction } from '@remix-run/node'
 import styles from './styles/app.css'
 import {
   Links,
@@ -6,9 +6,12 @@ import {
   Meta,
   Outlet,
   Scripts,
-  ScrollRestoration
+  ScrollRestoration,
+  useLoaderData
 } from '@remix-run/react'
 import { Layout } from './components/Layout'
+import type { User } from './services/auth.server'
+import { authenticator } from './services/auth.server'
 
 export function links () {
   return [{ rel: 'stylesheet', href: styles }]
@@ -20,7 +23,10 @@ export const meta: MetaFunction = () => ({
   viewport: 'width=device-width,initial-scale=1'
 })
 
+export const loader: LoaderFunction = async ({ request }) => await authenticator.isAuthenticated(request)
+
 export default function App () {
+  const user = useLoaderData<User | null>()
   return (
     <html lang="en">
       <head>
@@ -28,7 +34,7 @@ export default function App () {
         <Links />
       </head>
       <body>
-        <Layout>
+        <Layout user={user}>
           <Outlet />
         </Layout>
         <ScrollRestoration />
