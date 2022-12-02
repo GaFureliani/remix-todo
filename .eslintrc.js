@@ -42,6 +42,7 @@ module.exports = {
     }],
     'react/react-in-jsx-scope': 'off',
     'react/jsx-indent': [1, 2],
+    '@typescript-eslint/return-await': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-unused-vars': 'warn',
     '@typescript-eslint/consistent-type-definitions': ['error', 'type'],

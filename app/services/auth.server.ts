@@ -1,10 +1,10 @@
 import { Authenticator } from 'remix-auth'
 import { FormStrategy } from 'remix-auth-form'
-import { sessionStorage } from '~/services/session.server'
+import { sessionStorage } from 'services/session.server'
 import { compare, hash } from 'bcrypt'
 import invariant from 'tiny-invariant'
 
-import { db } from '~/helpers/db'
+import { db } from 'helpers/db'
 
 export type User = {
   id: number

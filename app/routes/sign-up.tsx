@@ -1,6 +1,6 @@
 import type { ActionFunction, LoaderFunction } from '@remix-run/node'
 import { Form } from '@remix-run/react'
-import { authenticator } from '~/services/auth.server'
+import { authenticator } from 'services/auth.server'
 
 export const action: ActionFunction = async ({ request }) => await authenticator.authenticate('user-register', request, { successRedirect: '/' })
 export const loader: LoaderFunction = async ({ request }) => await authenticator.isAuthenticated(request, { successRedirect: '/' })

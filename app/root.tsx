@@ -1,5 +1,6 @@
 import type { LoaderFunction, MetaFunction } from '@remix-run/node'
 import styles from './styles/app.css'
+import datePickerStyles from 'react-datepicker/dist/react-datepicker.css'
 import {
   Links,
   LiveReload,
@@ -14,7 +15,7 @@ import type { User } from './services/auth.server'
 import { authenticator } from './services/auth.server'
 
 export function links () {
-  return [{ rel: 'stylesheet', href: styles }]
+  return [{ rel: 'stylesheet', href: styles }, { rel: 'stylesheet', href: datePickerStyles }]
 }
 
 export const meta: MetaFunction = () => ({

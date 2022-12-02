@@ -1,12 +1,14 @@
 import { Link } from '@remix-run/react'
 import { Fragment } from 'react'
-import type { User } from '~/services/auth.server'
+import { useLogout } from 'hooks/useLogout'
+import type { User } from 'services/auth.server'
 
 type AppbarProps = {
   user: User | null
 }
 
 export const Appbar = ({ user }: AppbarProps) => {
+  const logout = useLogout()
   return (
     <div className="h-[48px] bg-blue-600 flex justify-between items-center px-4">
       <Link to='/' className='flex items-center gap-2 hover:bg-blue-500 transition text-white px-4 py-1 rounded-full'>
@@ -35,11 +37,11 @@ export const Appbar = ({ user }: AppbarProps) => {
             <span className='px-4 py-2 bg-black text-white rounded-full'>
               {user.username}
             </span>
-            <Link to='/logout' className='hover:bg-blue-500 transition text-white px-4 py-1 rounded-full'>
+            <button onClick={logout} className='hover:bg-blue-500 transition text-white px-4 py-1 rounded-full'>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
               </svg>
-            </Link>
+            </button>
           </Fragment>
         )}
       </div>

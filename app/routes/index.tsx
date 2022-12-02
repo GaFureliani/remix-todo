@@ -1,45 +1,38 @@
 import type { Todo } from '@prisma/client'
 import type { ActionFunction, LoaderFunction } from '@remix-run/node'
 import { Form, useLoaderData } from '@remix-run/react'
-import invariant from 'tiny-invariant'
-import { db } from '~/helpers/db'
-import type { User } from '~/services/auth.server'
-import { authenticator } from '~/services/auth.server'
-import formatRelative from 'date-fns/formatRelative'
+import { createTodo } from 'helpers/create-todo.server'
+import { deleteTodo } from 'helpers/delete-todo.server'
+import { getTodos } from 'helpers/get-todos.server'
+import { updateTodo } from 'helpers/update-todo.server'
+import type { User } from 'services/auth.server'
+import { authenticator } from 'services/auth.server'
 
-type LoaderData = { user: User | null, todos: Todo[] }
+type LoaderData = { user: User | null, todos: Todo[] | null }
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData()
-  const actionType = formData.get('actionType')
-  if (actionType === 'createTodo') {
-    const user = await authenticator.isAuthenticated(request)
-    invariant(user, 'You are not authenticated.')
-    const newTodo = await db.todo.create({
-      data: {
-        author: {
-          connect: { id: user.id }
-        },
-        description: '',
-        targetDate: new Date()
-      }
-    })
-    return newTodo
-  } else {
-    return new Response()
+  const intent = formData.get('intent')
+
+  switch (intent) {
+    case 'create':
+      return await createTodo(request)
+    case 'update':
+      return await updateTodo(request)
+    case 'delete':
+      return await deleteTodo(request)
+    default:
+      return null
   }
 }
 
 export const loader: LoaderFunction = async ({ request }): Promise<LoaderData> => {
   const user = await authenticator.isAuthenticated(request)
-  let todos: Todo[] = []
+  let todos: Todo[] | null = null
   if (user != null) {
-    todos = await db.todo.findMany({
-      where: {
-        authorId: user.id
-      }
-    })
+    todos = await getTodos(request)
   }
+
   return {
     user,
     todos
@@ -56,37 +49,14 @@ export default function Index () {
     )
   }
   return (
-    <div className='flex flex-col items-center h-[calc(100vh-48px)]'>
-      <table className='table-fixed'>
-        <thead>
-          <tr>
-            <th className='px-12'>id</th>
-            <th className='px-12'>done</th>
-            <th className='px-12'>description</th>
-            <th className='px-12'>target date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.todos.map(t => (
-            <tr key={t.id}>
-              <td className='text-center'>{t.id}</td>
-              <Form>
-                <input type='checkbox' className='text-center' defaultChecked={t.isDone} />
-                <input type='text' className='text-center' defaultValue={t.description} />
-                <input type='datetime-locale' className='text-center' defaultValue={formatRelative(new Date(t.targetDate), Date.now())} />
-              </Form>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <Form method='post'>
-        <button name='actionType' value='createTodo' className='flex items-center gap-2 bg-blue-600 px-4 py-2 mt-4 rounded-full text-white'>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
-          Create new todo
-        </button>
-      </Form>
-    </div>
+
+    <Form method='post'>
+      <button type='submit' name='intent' value='create' className='flex items-center gap-2 bg-blue-600 px-4 py-2 mt-4 rounded-full text-white'>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        Create new todo
+      </button>
+    </Form>
   )
 }
