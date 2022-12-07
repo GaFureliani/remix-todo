@@ -1,11 +1,6 @@
-import { authenticator } from 'services/auth.server'
-import invariant from 'tiny-invariant'
 import { db } from './db'
 
-export const createTodo = async (request: Request) => {
-  const user = await authenticator.isAuthenticated(request)
-  invariant(user, 'You are not authenticated.')
-
+export const createTodo = async (authorId: number) => {
   return await db.todo.create({
     data: {
       isDone: false,
@@ -13,7 +8,7 @@ export const createTodo = async (request: Request) => {
       targetDate: new Date().toISOString(),
       author: {
         connect: {
-          id: user.id
+          id: authorId
         }
       }
     }

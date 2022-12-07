@@ -14,7 +14,7 @@ export type User = {
 
 // Create an instance of the authenticator, pass a generic with what
 // strategies will return and will store in the session
-export const authenticator = new Authenticator<User>(sessionStorage)
+export const authenticator = new Authenticator<User>(sessionStorage, { throwOnError: true })
 
 // Tell the Authenticator to use the form strategy
 authenticator.use(
